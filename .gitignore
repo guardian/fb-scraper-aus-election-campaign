@@ -1,0 +1,4 @@
+*.sqlite
+/imgs/
+__pycache__
+.DS_Store
