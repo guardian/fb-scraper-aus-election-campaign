@@ -2,6 +2,7 @@ import scraper
 import utilities
 import uploadImages
 import uploadJson
+import ocrImages
 
 # run it 
 
@@ -11,6 +12,7 @@ scraper.runScraper()
 
 utilities.getImages()
 uploadImages.runUpload()
+ocrImages.ocrImages()
 
 # print update of new ads
 

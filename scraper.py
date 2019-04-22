@@ -2,18 +2,14 @@ import requests
 import lxml.html
 import scraperwiki
 from datetime import datetime
-from datetime import timedelta
 import simplejson as json
 import time
 import os
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
-import pickle
-from selenium.webdriver import DesiredCapabilities
 import random
-import updates
 import utilities
+import mmh3
 
 # pagesFile = open('facebookPages.json')
 # pages = json.load(pagesFile)
@@ -103,6 +99,7 @@ def runScraper():
 					data['ad_text'] = ""
 
 				data['start_date'] = ad_element.cssselect("._7jwu")[0].text_content()
+				data['start_date_short'] = data['start_date'].split("Started running on ")[1]
 				# print(data['ad_text'])
 				data['page_title'] = page['page_title']
 				data['page_id'] = page['page_id']
@@ -115,7 +112,7 @@ def runScraper():
 				data['party'] = page['party']
 				data['house'] = page['house']
 				data['dateScraped'] = dateScraped
-
+				data['images_uploaded'] = None
 				data['image_url'] = ""
 				data['image_id'] = ""
 
@@ -144,6 +141,8 @@ def runScraper():
 					data['av_img_id'] = data['av_img_url'].split("/")[5].split("?")[0]
 
 				data['clean_html'] = utilities.cleanHtml(data)	
+				text = row['page_id'] + row['ad_text'] + row['image_id'] + row['vid_image_id']
+				row['unique_id'] = mmh3.hash(text, signed=False)
 
 				# check if it has been scraped before
 

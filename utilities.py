@@ -7,6 +7,7 @@ import simplejson as json
 import time
 from lxml.html.clean import Cleaner
 from datetime import datetime
+import mmh3
 
 def getImages():
 
@@ -97,7 +98,7 @@ def cleanExistingHtml():
 	for row in queryResult:
 		row['clean_html'] = cleanHtml(row)
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_url","vid_image_url"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
 
 def updateImageCol():
 	queryString = "* from ads"
@@ -105,7 +106,7 @@ def updateImageCol():
 	for row in queryResult:
 		row['images_uploaded'] = True
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_url","vid_image_url"], data=row, table_name="ads")	
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")	
 
 def generateImgUrls():
 
@@ -126,7 +127,7 @@ def generateImgUrls():
 			print(row['vid_image_id'])
 
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_url","vid_image_url"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
 
 def generateAvUrls():
 
@@ -138,4 +139,23 @@ def generateAvUrls():
 		row['av_img_url'] = snippet.cssselect("._7pg4")[0].attrib['src']
 		row['av_img_id'] = row['av_img_url'].split("/")[5].split("?")[0]
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_url","vid_image_url"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
+
+def makeUniqueIDs():
+
+	queryString = "* from ads"
+	queryResult = scraperwiki.sqlite.select(queryString)
+
+	# allId = []
+
+	for row in queryResult:
+		text = row['page_id'] + row['ad_text'] + row['image_id'] + row['vid_image_id']
+		row['unique_id'] = mmh3.hash(text, signed=False)
+		# allId.append(row['unique_id'])
+		print(row['unique_id'])
+
+		time.sleep(0.1)
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")	
+
+	# print("all", len(allId))
+	# print("unique", len(set(allId)))					

@@ -8,8 +8,8 @@ import scraperwiki
 import time
 
 def runUpload():
-	AWS_KEY = os.environ['AWS_ACCESS_KEY_ID']
-	AWS_SECRET = os.environ['AWS_SECRET_ACCESS_KEY']
+	AWS_KEY = os.environ['AWS_KEY_ID']
+	AWS_SECRET = os.environ['AWS_SECRET_KEY']
 
 	queryString = "* from ads where images_uploaded IS NULL"
 	queryResult = scraperwiki.sqlite.select(queryString)
