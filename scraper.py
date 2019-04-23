@@ -10,12 +10,23 @@ from selenium.webdriver.firefox.options import Options
 import random
 import utilities
 import mmh3
+from sys import platform
 
-# pagesFile = open('facebookPages.json')
-# pages = json.load(pagesFile)
+test = False
 
-# pagesFile = open('majorParties.json')
-# pages = json.load(pagesFile)
+if platform == 'linux':
+	from pyvirtualdisplay import Display 
+	display = Display(visible=0, size=(1024, 768)) 
+	display.start() 
+
+def _splitUrl(urlstring):
+	splits = urlstring.split("/")
+	image_id = ""
+	for split in splits:
+		if ".png" in split or ".jpg" in split:
+			image_id = split.split("?")[0]
+
+	return image_id		
 
 def runScraper():
 	pageJson = requests.get('https://interactive.guim.co.uk/docsdata/1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw.json').json()['sheets']
@@ -47,7 +58,6 @@ def runScraper():
 	driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver', options=options)
 
 	dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
-
 
 	for x in range(upto,len(pages)):
 
@@ -120,7 +130,7 @@ def runScraper():
 
 				if len(images) > 0:
 					data['image_url'] = images[0].attrib['src']
-					data['image_id'] = images[0].attrib['src'].split("/")[6].split("?")[0]
+					data['image_id'] = _splitUrl(images[0].attrib['src'])
 
 				data['vid_image_url'] = ""
 				data['vid_image_id'] = ""
@@ -129,7 +139,7 @@ def runScraper():
 
 				if len(vid_images) > 0:
 					data['vid_image_url'] = vid_images[0].attrib['poster']
-					data['vid_image_id'] = vid_images[0].attrib['poster'].split("/")[5].split("?")[0]
+					data['vid_image_id'] = _splitUrl(vid_images[0].attrib['poster'])
 
 				data['av_img_url'] = ""
 				data['av_img_id'] = ""	
@@ -138,11 +148,11 @@ def runScraper():
 
 				if len(av_images) > 0:	
 					data['av_img_url'] = av_images[0].attrib['src']
-					data['av_img_id'] = data['av_img_url'].split("/")[5].split("?")[0]
+					data['av_img_id'] = _splitUrl(av_images[0].attrib['src'])
 
 				data['clean_html'] = utilities.cleanHtml(data)	
-				text = row['page_id'] + row['ad_text'] + row['image_id'] + row['vid_image_id']
-				row['unique_id'] = mmh3.hash(text, signed=False)
+				text = data['page_id'] + data['ad_text'] + data['image_id'] + data['vid_image_id']
+				data['unique_id'] = mmh3.hash(text, signed=False)
 
 				# check if it has been scraped before
 
@@ -153,9 +163,14 @@ def runScraper():
 
 				if not queryResult:
 					print("new ad")
-					scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=data, table_name="ads")
+					if not test:
+						scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=data, table_name="ads")
+					if test:
+						print(data)
 				else:
 					print("No updates")
+					if test:
+						print(data)
 					# print(queryResult[0]['ad_text'])
 					# print(data['ad_text'])
 
@@ -163,3 +178,6 @@ def runScraper():
 			print("No ads found")			
 
 	driver.close()
+
+if test:
+	runScraper()	
