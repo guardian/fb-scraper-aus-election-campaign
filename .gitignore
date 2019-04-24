@@ -8,3 +8,4 @@ testSelen.py
 testSelen2.pt
 sentiment.csv
 *.json
+fb-data*
