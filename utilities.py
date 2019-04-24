@@ -49,9 +49,28 @@ def cleanHtml(row):
 		# Remove js and css
 		
 		snippet = lxml.html.fromstring(row['html'])
+		images = snippet.cssselect("._7jys")
+
+		# Remove all but first image for gallery posts
+
+		if len(images) > 1:
+			origNumber = len(images) - 1
+			
+			imageStr = "images"
+			
+			if origNumber == 1:
+				imageStr = "image"
+
+			tagString = "<div class='imageCount'>This post originally contained {origNumber} more {imageStr}</div>".format(origNumber=origNumber, imageStr=imageStr)
+
+			for x in range(1, len(images)):
+				el = images[x].drop_tree()
+
+			images[0].addnext(lxml.html.fromstring(tagString))
+			
 		cleaned = cleaner.clean_html(snippet)
 
-		# replace main and avatart img src with guardian cdn eg https://interactive.guim.co.uk/2019/04/fb-ad-images/57617685_385077462333660_5324670939118436352_n.jpg
+		# replace main and avatar img src with guardian cdn eg https://interactive.guim.co.uk/2019/04/fb-ad-images/57617685_385077462333660_5324670939118436352_n.jpg
 
 		cleaned.cssselect("._7jys")[0].attrib['src'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['image_id']
 		cleaned.cssselect("._7pg4")[0].attrib['src'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['av_img_id']
@@ -65,6 +84,7 @@ def cleanHtml(row):
 		cleaned = cleaner.clean_html(snippet)
 
 		cleaned.cssselect("._1oad video")[0].attrib['poster'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['vid_image_id']
+		cleaned.cssselect("._1oad video")[0].attrib['src'] = ""
 		cleaned.cssselect("._7pg4")[0].attrib['src'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['av_img_id']
 
 		return(lxml.html.tostring(cleaned))
@@ -157,4 +177,4 @@ def makeUniqueIDs():
 		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")	
 
 	# print("all", len(allId))
-	# print("unique", len(set(allId)))					
+	# print("unique", len(set(allId)))				

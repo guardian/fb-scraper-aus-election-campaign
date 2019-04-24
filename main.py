@@ -39,10 +39,10 @@ uploadImages.runUpload(test)
 
 ocrImages.ocrImages(today,test)
 
-# print update of new ads
-
-utilities.getNewAds(today, test)
-
 # update json of results
 
 uploadJson.uploadJson(test)
+
+# print update of new ads
+
+utilities.getNewAds(today, test)

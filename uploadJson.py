@@ -45,4 +45,4 @@ def uploadJson(test):
 		print("Uploading CSV to S3")
 		key2 = "2019/04/fb-ad-data/fb-data.csv.gz"
 		s3.meta.client.upload_file('fb-data.csv.gz', bucket, key2, ExtraArgs={"CacheControl":"max-age=300", 'ACL':'public-read'})
-		print("Done")
+		print("Done")	
