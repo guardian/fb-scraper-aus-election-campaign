@@ -7,7 +7,7 @@ import scraperwiki
 import time
 import simplejson as json
 
-def uploadJson():
+def uploadJson(test):
 	AWS_KEY = os.environ['AWS_KEY_ID']
 	AWS_SECRET = os.environ['AWS_SECRET_KEY']
 
@@ -25,14 +25,15 @@ def uploadJson():
 	with open('fb-data.json','w') as fileOut:
 			fileOut.write(results)
 
-	print("Connecting to S3")
-	bucket = 'gdn-cdn'
-	session = boto3.Session(
-	aws_access_key_id=AWS_KEY,
-	aws_secret_access_key=AWS_SECRET,
-	)
-	s3 = session.resource('s3')
-	key = "2019/04/fb-ad-data/fd-data.json"
-	object = s3.Object(bucket, key)
-	object.put(Body=results, CacheControl="max-age=300", ACL='public-read')
-	print("Uploaded json")
+	if not test:		
+		print("Connecting to S3")
+		bucket = 'gdn-cdn'
+		session = boto3.Session(
+		aws_access_key_id=AWS_KEY,
+		aws_secret_access_key=AWS_SECRET,
+		)
+		s3 = session.resource('s3')
+		key = "2019/04/fb-ad-data/fd-data.json"
+		object = s3.Object(bucket, key)
+		object.put(Body=results, CacheControl="max-age=300", ACL='public-read')
+		print("Uploaded json")

@@ -3,7 +3,7 @@ from PIL import Image
 import cv2
 import os
 import pytesseract
-from datetime import datetime
+import arrow
 import time
 
 def readImage(fileName):
@@ -19,9 +19,8 @@ def readImage(fileName):
 	print(text)
 	return text
 
-def ocrImages():
-
-	today = datetime.strftime(datetime.now(), '%Y-%m-%d')
+def ocrImages(today, test):
+	
 	queryString = "* from ads where dateScraped='{today}'".format(today=today)
 	queryResult = scraperwiki.sqlite.select(queryString)
 
@@ -36,7 +35,8 @@ def ocrImages():
 				print(row['image_id'], row['page_title'])
 				row['imageText'] = readImage(row['vid_image_id'])
 		
-		time.sleep(0.1)		
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
+		time.sleep(0.1)
+		if not test:		
+			scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
 		
 	

@@ -1,5 +1,16 @@
- sudo apt update
- sudo apt install python3-pip
- sudo apt-get install python3-venv
- python3 -m venv virt
- source virt/bin/activate
+Server setup instructions
+
+sudo apt update
+sudo apt install python3-pip
+sudo apt-get install python3-venv
+sudo apt-get install xvfb xserver-xephyr vnc4server
+sudo apt-get install firefox
+wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
+rm geckodriver-v0.24.0-linux64.tar.gz
+chmod +x geckodriver
+sudo cp geckodriver /usr/local/bin/
+python3 -m venv virt
+source virt/bin/activate
+pip3 install -r requirements.txt
+git clone https://github.com/guardian/fb-scraper-aus-election-campaign.git

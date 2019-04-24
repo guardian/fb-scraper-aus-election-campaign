@@ -1,7 +1,6 @@
 import requests
 import lxml.html
 import scraperwiki
-from datetime import datetime
 import simplejson as json
 import time
 import os
@@ -11,8 +10,7 @@ import random
 import utilities
 import mmh3
 from sys import platform
-
-test = False
+import arrow
 
 if platform == 'linux':
 	from pyvirtualdisplay import Display 
@@ -28,7 +26,7 @@ def _splitUrl(urlstring):
 
 	return image_id		
 
-def runScraper():
+def runScraper(today, test):
 	pageJson = requests.get('https://interactive.guim.co.uk/docsdata/1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw.json').json()['sheets']
 
 	pages = []
@@ -53,13 +51,18 @@ def runScraper():
 
 	options = Options()
 	options.headless = True
+	
 	upto = 0
+	endto = len(pages)
+	
+	if test:
+		endto = 5
 
 	driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver', options=options)
 
-	dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
+	# today = arrow.now('Australia/Sydney').strftime('%Y-%m-%d')
 
-	for x in range(upto,len(pages)):
+	for x in range(upto,endto):
 
 		page = pages[x]
 
@@ -121,7 +124,7 @@ def runScraper():
 				data['name'] = page['name']
 				data['party'] = page['party']
 				data['house'] = page['house']
-				data['dateScraped'] = dateScraped
+				data['dateScraped'] = today
 				data['images_uploaded'] = None
 				data['image_url'] = ""
 				data['image_id'] = ""
@@ -178,6 +181,3 @@ def runScraper():
 			print("No ads found")			
 
 	driver.close()
-
-if test:
-	runScraper()	

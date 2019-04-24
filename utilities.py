@@ -6,12 +6,11 @@ import scraperwiki
 import simplejson as json
 import time
 from lxml.html.clean import Cleaner
-from datetime import datetime
+import arrow
 import mmh3
 
-def getImages():
+def getImages(today, test):
 
-	today = datetime.strftime(datetime.now(), '%Y-%m-%d')
 	queryString = "* from ads where dateScraped='{today}'".format(today=today)
 	queryResult = scraperwiki.sqlite.select(queryString)
 	
@@ -31,9 +30,10 @@ def getImages():
 
 	for row in images_unique:
 		print("Getting", row['image_url'])
-		r = requests.get(row['image_url'])
-		with open('imgs/{image_id}'.format(image_id=row['image_id']), 'wb') as f:
-			f.write(r.content)
+		if not test:
+			r = requests.get(row['image_url'])
+			with open('imgs/{image_id}'.format(image_id=row['image_id']), 'wb') as f:
+				f.write(r.content)
 
 	print("Done saving images")		
 
@@ -70,9 +70,8 @@ def cleanHtml(row):
 		return(lxml.html.tostring(cleaned))
 
 
-def getNewAds():
-
-	today = datetime.strftime(datetime.now(), '%Y-%m-%d')
+def getNewAds(today, test):
+	
 	queryString = "* from ads where dateScraped='{today}'".format(today=today)
 	print(queryString)
 	queryResult = scraperwiki.sqlite.select(queryString)
