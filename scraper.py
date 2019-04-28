@@ -178,6 +178,8 @@ def runScraper(today, test):
 					# print(data['ad_text'])
 
 		else:
-			print("No ads found")			
+			print("No ads found")
+	
+		scraperwiki.sqlite.save_var('upto', x)					
 
 	driver.close()

@@ -5,6 +5,7 @@ import uploadJson
 import ocrImages
 import arrow
 import argparse
+import notifications
 
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -45,4 +46,8 @@ uploadJson.uploadJson(test)
 
 # print update of new ads
 
-utilities.getNewAds(today, test)
+# utilities.getNewAds(today, test)
+
+# Email update
+
+notifications.sendNotifications(today,test)

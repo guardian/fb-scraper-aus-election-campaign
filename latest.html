@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Latest ads</title>
+		<link rel="stylesheet" type="text/css" href="ads.css" />
+
+	<style type="text/css">
+		.ads {
+			margin-left: 10%;
+		}
+
+		.ad {
+			max-width: 620px;
+			border-bottom: 1px #efefef solid;
+			padding-bottom: 20px;
+		}
+
+		.ad img {
+			max-width:620px
+		}
+
+	</style>
+
+	</head>
+	<body>
+	<div class="ads">
+		{{#each this}}
+			<div class="ad">
+				<h4>New ad from {{page_title}}</h4>
+				<p>{{ad_text}}</p>
+				{{#if image_id}}
+					<img src="https://interactive.guim.co.uk/2019/04/fb-ad-images/{{image_id}}" />
+				{{/if}}
+				{{#if vid_image_id}}
+					<img src="https://interactive.guim.co.uk/2019/04/fb-ad-images/{{vid_image_id}}" />
+				{{/if}}	
+			</div>	
+	{{/each}}
+	<div>
+	</body>
+</html>

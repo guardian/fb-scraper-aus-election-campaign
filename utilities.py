@@ -45,13 +45,11 @@ def cleanHtml(row):
 
 	if row['image_id'] != "":
 		print("Image post")
-
-		# Remove js and css
 		
 		snippet = lxml.html.fromstring(row['html'])
 		images = snippet.cssselect("._7jys")
 
-		# Remove all but first image for gallery posts
+		# Remove all but first image for gallery posts, add text saying we removed them
 
 		if len(images) > 1:
 			origNumber = len(images) - 1
@@ -67,6 +65,8 @@ def cleanHtml(row):
 				el = images[x].drop_tree()
 
 			images[0].addnext(lxml.html.fromstring(tagString))
+			
+		# Remove js and css
 			
 		cleaned = cleaner.clean_html(snippet)
 
