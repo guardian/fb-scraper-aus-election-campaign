@@ -18,7 +18,7 @@ def sendNotifications(today, test):
 	AWS_SECRET = os.environ['AWS_SECRET_KEY']
 	
 	fromaddr = "alerts@nickevershed.com"
-	recipients = ["nick.evershed@theguardian.com"]
+	recipients = ["nick.evershed@theguardian.com","andy.ball@theguardian.com","christopher.knaus@theguardian.com"]
 	print("Checking if there are new ads")
 	queryString = "* from ads where dateScraped='{today}'".format(today=today)
 	
@@ -48,7 +48,7 @@ def sendNotifications(today, test):
 		body = "{adNumber} new facebook ads, see them <a href='https://interactive.guim.co.uk/2019/04/fb-ad-data/latest.html'>here</a>".format(adNumber=adNumber)
 		
 		output = template(tempQueries)
-		print(output)
+		# print(output)
 
 		for row in tempQueries:
 			newSent.append(str(row['unique_id']))

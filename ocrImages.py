@@ -29,14 +29,23 @@ def ocrImages(today, test):
 
 		if row['image_id'] != "":
 				print(row['image_id'], row['page_title'])
-				row['imageText'] = readImage(row['image_id'])
-			
+				try:
+					row['imageText'] = readImage(row['image_id'])
+				except Exception as e:
+					row['imageText'] = ""
+					print("error")
+					print(e)
+
 		if row['vid_image_id'] != "":
 				print(row['image_id'], row['page_title'])
-				row['imageText'] = readImage(row['vid_image_id'])
+				try:
+					row['imageText'] = readImage(row['vid_image_id'])
+				except Exception as e:
+					row['imageText'] = ""
+					print("Error")
+					print(e)	
 		
 		time.sleep(0.1)
 		if not test:		
-			scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
-		
-	
+			scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")
+			

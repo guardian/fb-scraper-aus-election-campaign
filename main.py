@@ -30,6 +30,8 @@ else:
 
 # run it 
 
+# timeout exception is TimeoutException
+
 scraper.runScraper(today,test)
 
 # handle all the files

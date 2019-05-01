@@ -67,7 +67,7 @@ for page in pages['politicians']:
 		data['page_title'] = pageInfoJson[0]['pageName']
 		data['page_id'] = pageInfoJson[0]['pageID']
 		data['page_url'] = page['page_url']
-		data['name'] = page['Name']
+		data['name'] = page['name']
 		data['party'] = page['party']
 		data['verified'] = page['verified']
 		data['house'] = page['house']

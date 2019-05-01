@@ -43,10 +43,11 @@ def cleanHtml(row):
 	cleaner.javascript = True
 	cleaner.style = True 
 
+	snippet = lxml.html.fromstring(row['html'])
+
 	if row['image_id'] != "":
 		print("Image post")
 		
-		snippet = lxml.html.fromstring(row['html'])
 		images = snippet.cssselect("._7jys")
 
 		# Remove all but first image for gallery posts, add text saying we removed them
@@ -65,7 +66,7 @@ def cleanHtml(row):
 				el = images[x].drop_tree()
 
 			images[0].addnext(lxml.html.fromstring(tagString))
-			
+	
 		# Remove js and css
 			
 		cleaned = cleaner.clean_html(snippet)
@@ -77,13 +78,35 @@ def cleanHtml(row):
 
 		return(lxml.html.tostring(cleaned))
 
-	elif row['vid_image_id'] != "":
+	elif row['vid_image_id'] != "" or row['vid_file_id'] != "":
 		print("Video post")
-
 		snippet = lxml.html.fromstring(row['html'])
+		videos = snippet.cssselect("._1oak video")
+		print(len(videos))
+		if len(videos) > 1:
+			origNumber = len(videos) - 1
+			print("Removing videos")
+			print("Original")
+			print(lxml.html.tostring(snippet))
+			videoStr = "videos"
+			
+			if origNumber == 1:
+				videoStr = "video"
+
+			tagString = "<div class='imageCount'>This post originally contained {origNumber} more {videoStr}</div>".format(origNumber=origNumber, videoStr=videoStr)
+
+			for x in range(1, len(videos)):
+				el = videos[x].drop_tree()
+
+			videos[0].addnext(lxml.html.fromstring(tagString))
+			print("Cleaned")
+			print(lxml.html.tostring(snippet))
+
+
 		cleaned = cleaner.clean_html(snippet)
 
-		cleaned.cssselect("._1oad video")[0].attrib['poster'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['vid_image_id']
+		if "poster" in snippet.cssselect("._1oad video")[0].attrib:
+			cleaned.cssselect("._1oad video")[0].attrib['poster'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['vid_image_id']
 		cleaned.cssselect("._1oad video")[0].attrib['src'] = ""
 		cleaned.cssselect("._7pg4")[0].attrib['src'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['av_img_id']
 
@@ -117,7 +140,18 @@ def cleanExistingHtml():
 	for row in queryResult:
 		row['clean_html'] = cleanHtml(row)
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")
+
+def modifyVidid():
+
+	queryString = "* from ads"
+	queryResult = scraperwiki.sqlite.select(queryString)
+
+	for row in queryResult:
+		if row['vid_file_id'] == None:
+			row['vid_file_id'] = ""
+			time.sleep(0.1)
+			scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
 
 def updateImageCol():
 	queryString = "* from ads"
@@ -125,7 +159,27 @@ def updateImageCol():
 	for row in queryResult:
 		row['images_uploaded'] = True
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")	
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")	
+
+def updatePartyCol():
+	pageJson = requests.get('https://interactive.guim.co.uk/docsdata/1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw.json').json()['sheets']
+
+	queryString = "* from ads where type='party'"
+	queryResult = scraperwiki.sqlite.select(queryString)
+
+	partyLookup = {}
+
+	for row in pageJson['parties']:
+		partyLookup[row['page_title']] = row['party']
+
+	print(partyLookup)
+
+	for row in queryResult:
+		print(row['page_title'])
+		print(partyLookup[row['page_title']])
+		row['party'] = partyLookup[row['page_title']]
+		time.sleep(0.1)
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")
 
 def generateImgUrls():
 
@@ -146,7 +200,7 @@ def generateImgUrls():
 			print(row['vid_image_id'])
 
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")
 
 def generateAvUrls():
 
@@ -158,7 +212,7 @@ def generateAvUrls():
 		row['av_img_url'] = snippet.cssselect("._7pg4")[0].attrib['src']
 		row['av_img_id'] = row['av_img_url'].split("/")[5].split("?")[0]
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")
 
 def makeUniqueIDs():
 
@@ -174,7 +228,7 @@ def makeUniqueIDs():
 		print(row['unique_id'])
 
 		time.sleep(0.1)
-		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=row, table_name="ads")	
+		scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=row, table_name="ads")	
 
 	# print("all", len(allId))
 	# print("unique", len(set(allId)))				

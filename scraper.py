@@ -21,7 +21,7 @@ def _splitUrl(urlstring):
 	splits = urlstring.split("/")
 	image_id = ""
 	for split in splits:
-		if ".png" in split or ".jpg" in split:
+		if ".png" in split or ".jpg" in split or ".mp4" in split:
 			image_id = split.split("?")[0]
 
 	return image_id		
@@ -41,7 +41,6 @@ def runScraper(today, test):
 		row['tags'] = ""
 		row['anonymous'] = ""
 		row['house'] = ""
-		row['party'] = ""
 		pages.append(row)
 
 	for row in pageJson['politicians']:
@@ -56,7 +55,7 @@ def runScraper(today, test):
 	endto = len(pages)
 	
 	if test:
-		endto = 5
+		endto = 15
 
 	driver = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver', options=options)
 
@@ -137,13 +136,19 @@ def runScraper(today, test):
 
 				data['vid_image_url'] = ""
 				data['vid_image_id'] = ""
+				data['vid_file_url'] = ""
+				data['vid_file_id'] = ""
 
 				vid_images = ad_element.cssselect("._1oak video")
 
 				if len(vid_images) > 0:
-					data['vid_image_url'] = vid_images[0].attrib['poster']
-					data['vid_image_id'] = _splitUrl(vid_images[0].attrib['poster'])
-
+					if "poster" in vid_images[0].attrib:
+						data['vid_image_url'] = vid_images[0].attrib['poster']
+						data['vid_image_id'] = _splitUrl(vid_images[0].attrib['poster'])
+					else:
+						data['vid_file_url'] = vid_images[0].attrib['src']
+						data['vid_file_id'] = _splitUrl(vid_images[0].attrib['src'])
+							
 				data['av_img_url'] = ""
 				data['av_img_id'] = ""	
 
@@ -153,8 +158,13 @@ def runScraper(today, test):
 					data['av_img_url'] = av_images[0].attrib['src']
 					data['av_img_id'] = _splitUrl(av_images[0].attrib['src'])
 
-				data['clean_html'] = utilities.cleanHtml(data)	
+				data['clean_html'] = utilities.cleanHtml(data)
+
 				text = data['page_id'] + data['ad_text'] + data['image_id'] + data['vid_image_id']
+
+				if data['vid_file_id'] != "":
+					text = text + data['vid_file_id']
+
 				data['unique_id'] = mmh3.hash(text, signed=False)
 
 				# check if it has been scraped before
@@ -167,11 +177,13 @@ def runScraper(today, test):
 				if not queryResult:
 					print("new ad")
 					if not test:
-						scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id"], data=data, table_name="ads")
+						scraperwiki.sqlite.save(unique_keys=["page_id","ad_text","image_id","vid_image_id","vid_file_id"], data=data, table_name="ads")
 					if test:
 						print(data)
+					# scraperwiki.sqlite.save_var('upto', x)	
 				else:
 					print("No updates")
+					# scraperwiki.sqlite.save_var('upto', x)	
 					if test:
 						print(data)
 					# print(queryResult[0]['ad_text'])
@@ -179,7 +191,6 @@ def runScraper(today, test):
 
 		else:
 			print("No ads found")
+			# scraperwiki.sqlite.save_var('upto', x)	
 	
-		scraperwiki.sqlite.save_var('upto', x)					
-
-	driver.close()
+	driver.close()	

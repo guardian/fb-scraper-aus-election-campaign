@@ -3,9 +3,10 @@
 __pycache__
 .DS_Store
 geckodriver.log
-fb-data.json
 testSelen.py
-testSelen2.pt
+testSelen2.py
 sentiment.csv
 *.json
+*.csv
 fb-data*
+analysis
