@@ -1,5 +1,4 @@
 # bunch of different functions
-
 import requests
 import lxml.html
 import scraperwiki
@@ -110,6 +109,11 @@ def cleanHtml(row):
 		cleaned.cssselect("._1oad video")[0].attrib['src'] = ""
 		cleaned.cssselect("._7pg4")[0].attrib['src'] = "https://interactive.guim.co.uk/2019/04/fb-ad-images/" + row['av_img_id']
 
+		return(lxml.html.tostring(cleaned))
+
+	else:
+		snippet = lxml.html.fromstring(row['html'])
+		cleaned = cleaner.clean_html(snippet)
 		return(lxml.html.tostring(cleaned))
 
 
