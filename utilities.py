@@ -85,8 +85,6 @@ def cleanHtml(row):
 		if len(videos) > 1:
 			origNumber = len(videos) - 1
 			print("Removing videos")
-			print("Original")
-			print(lxml.html.tostring(snippet))
 			videoStr = "videos"
 			
 			if origNumber == 1:
@@ -99,8 +97,6 @@ def cleanHtml(row):
 
 			videos[0].addnext(lxml.html.fromstring(tagString))
 			print("Cleaned")
-			print(lxml.html.tostring(snippet))
-
 
 		cleaned = cleaner.clean_html(snippet)
 
