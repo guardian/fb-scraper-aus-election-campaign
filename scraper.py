@@ -27,7 +27,13 @@ def _splitUrl(urlstring):
 	return image_id		
 
 def runScraper(today, test):
-	pageJson = requests.get('https://interactive.guim.co.uk/docsdata/1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw.json').json()['sheets']
+	
+	# short 1OKiyaIZknL43bvAjkzuZ5FClQ1lA7Pis99rdlFWL2bY
+	# full 1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw
+	
+	pageKey = "1VvyKimrkoQl1CuCMwVgk9zd46Sk72ogyQ50j40EBElw"
+
+	pageJson = requests.get('https://interactive.guim.co.uk/docsdata/{pageKey}.json'.format(pageKey=pageKey)).json()['sheets']
 
 	pages = []
 
@@ -78,12 +84,15 @@ def runScraper(today, test):
 
 		scrollAndWait()	
 
+		if "Blocked from Searching or Viewing the Ad Archive" in driver.page_source:
+			print("Blocked from Searching or Viewing the Ad Archive")
+
 		if "There are no ads that match your search criteria." not in driver.page_source:
 			
 			dom = lxml.html.fromstring(driver.page_source)
 			# print(driver.page_source)
 			try:
-				ad_number = dom.cssselect('._7gn2 div')[0].text.replace("~","").replace(" results","").replace(" result","")
+				ad_number = dom.cssselect('._7gn2 div')[0].text.replace("~","").replace(" results","").replace(" result","").replace(",","")
 			except:
 				print(driver.page_source)
 				
