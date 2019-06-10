@@ -15,4 +15,6 @@ The exported data is available [here](https://interactive.guim.co.uk/2019/04/fb-
 
 Things to keep in mind for data analysis:
 
-All the party pages have been tracked since April 11, the start of the campaign. However, not all other pages have been tracked over the entire campaign. New pages are added daily. Some pages publish a mix of political and non-political ad content
+All the party pages have been tracked since April 11, the start of the campaign. However, not all other pages have been tracked over the entire campaign. New pages are added daily. Some pages publish a mix of political and non-political ad content.
+
+It is not possible to look at ad volume with this data, as it tracks whatever Facebook's ad library considers to be a unique ad. For example a page could run only one unique ad, but pay for millions of impressions, or a page could run hundreds of different ads with only a small amount of impressions each. 
