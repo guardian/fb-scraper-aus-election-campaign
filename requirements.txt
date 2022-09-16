@@ -9,7 +9,7 @@ EasyProcess==0.2.5
 idna==2.8
 jmespath==0.9.4
 lxml==4.3.3
-Mako==1.0.9
+Mako==1.2.2
 MarkupSafe==1.1.1
 mmh3==2.5.1
 numpy==1.16.3
